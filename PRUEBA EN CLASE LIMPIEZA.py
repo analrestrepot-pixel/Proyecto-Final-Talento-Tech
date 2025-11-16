@@ -38,6 +38,7 @@ print(df.columns)
 
 df.rename (columns={"Año desmovilización": "anoDesmov"}, inplace=True) # se EX grupo por Grupo Armado
 print(df.columns)
+ntr
 
 
 
