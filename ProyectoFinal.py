@@ -72,5 +72,7 @@ df['DESPLAZ'].fillna(df['DESPLAZ'].mode()[0], inplace=True)  # Moda para Embarqu
 print(df.isnull().sum())
 df['DESPLAZ'].mode()
 
-
+print(df.info())
+#COnvertir nombres y apellidos de tipo obj a str
+df[['APELLIDOS','NOMBRES']]=df [['APELLIDOS','NOMBRES']].astype("string")
 print(df.info())
