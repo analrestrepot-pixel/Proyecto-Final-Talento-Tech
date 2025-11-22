@@ -360,24 +360,30 @@ df1.to_csv("desmovilizados.csv",index=True)
 
 data = df1.copy()
 
-# One-Hot Encoder
+# One-Hot Encoder para Sexo
 
 ohe = OneHotEncoder(sparse_output=False, drop="first")
 ohe_cols = ohe.fit_transform(data[["sexo"]])
 data["sexo"] = ohe_cols
 
-# Label Encoder
+# Label Encoder para tipo
 le = LabelEncoder()
 data["tipo"] = le.fit_transform(data["tipo"])
 
+print(df1['ingresoSub'].value_counts()) # Quitar por establecer / alfabetizacion
+
+#Se borró Columna ingresoSub porque no tenía Variabilidad.
+data = data.drop(columns=["ingresoSub"])
+
+print(df1['subsidiado'].value_counts()) 
+
+# One-Hot Encoder para Subsidiado
+
+le = LabelEncoder()
+data["subsidiado"] = le.fit_transform(data["subsidiado"])
 
 
-
-
-
-
-
-
+print(data['grupoArmado'].value_counts()) 
 
 
 
