@@ -383,72 +383,65 @@ le = LabelEncoder()
 data["subsidiado"] = le.fit_transform(data["subsidiado"])
 
 
-print(data['grupoArmado'].value_counts()) 
+print(data['servPublicos'].value_counts()) 
+
+# Ordinal Encoder para jerarquía de nivel educativo
+
+orden = [["alfabetizacion", "basica primaria", "basica secundaria", "bachiller", "por establecer"]]
+oe = OrdinalEncoder(categories=orden)
+data["nivelEducativo"] = oe.fit_transform(data[["nivelEducativo"]])
+
+
+# One-Hot Encoder para grupo armado
 
 
 
 
+if "grupoArmado" in data.columns:
+    print("Valores únicos de 'embarked' antes:", data["grupoArmado"].unique())
+    data = pd.get_dummies(data, columns=["grupoArmado"], prefix="grupoArmado", drop_first=True)
+    print("Columnas de 'grupoArmado' después del OHE:")
+    print([col for col in data.columns if col.startswith("grupoArmado_")])
+else:
+    print("⚠ La columna 'embarked' no existe. Ajusta el código si tu dataset es diferente.")
 
-# Label Encoder
-le = LabelEncoder()
-data["Sex_label"] = le.fit_transform(data["Sex"])
-data["Embarked_label"] = le.fit_transform(data["Embarked"].astype(str))
 
-# One-Hot Encoding
-ohe = OneHotEncoder(sparse_output=False, drop="first")
-ohe_cols = ohe.fit_transform(data[["Sex"]])
-data["Sex_ohe"] = ohe_cols
+# One-Hot Encoder para estadoProceso
 
-# Ordinal Encoder
-ord_encoder = OrdinalEncoder(categories=[["male", "female"]])
-data["Sex_ordinal"] = ord_encoder.fit_transform(data[["Sex"]])
+if "estadoProceso" in data.columns:
+    print("Valores únicos de 'embarked' antes:", data["estadoProceso"].unique())
+    data = pd.get_dummies(data, columns=["estadoProceso"], prefix="estadoProceso", drop_first=True)
+    print("Columnas de 'estadoProceso' después del OHE:")
+    print([col for col in data.columns if col.startswith("estadoProceso_")])
+else:
+    print("⚠ La columna 'embarked' no existe. Ajusta el código si tu dataset es diferente.")
 
-# Frequency Encoder
-freq_encoder = data["Sex"].value_counts(normalize=True)
-data["Sex_freq"] = data["Sex"].map(freq_encoder)
+#Se borró Columna ingresoSub porque no tenía Variabilidad.
+data = data.drop(columns=["departamento"])
 
-# Target Encoder
-target_encoder = ce.TargetEncoder(cols=["Sex"])
-data["Sex_target"] = target_encoder.fit_transform(data["Sex"], data["Survived"])
 
-# Binary Encoder
-bin_encoder = ce.BinaryEncoder(cols=["Sex"])
-bin_out = bin_encoder.fit_transform(data[["Sex"]])
-data = pd.concat([data, bin_out], axis=1)
-
-print("\n==== DATOS CODIFICADOS ====")
-print(data.head())
-
-# ==================================================
-# 7. SELECCIÓN DE CARACTERÍSTICAS
-# ==================================================
-data_sel = df_no_outliers.copy()
-data_sel["Sex_label"] = le.fit_transform(data_sel["Sex"])
-data_sel["Embarked_label"] = le.fit_transform(data_sel["Embarked"].astype(str))
-
-X = data_sel[["Age", "Fare", "Pclass", "Sex_label", "Embarked_label"]]
-y = data_sel["Survived"]
-
-# Varianza
-selector = VarianceThreshold(threshold=0.5)
-_ = selector.fit_transform(X)
-features_var = X.columns[selector.get_support()]
-print("\nVariables con varianza aceptada:", list(features_var))
-
-# Correlación
-xy = X.copy()
-xy["Survived"] = y
-
-correlacion = xy.corr()["Survived"].abs().sort_values(ascending=False)
-relevant_features = correlacion[correlacion > 0.15].index.tolist()
-relevant_features.remove("Survived")
-
-print("\nVariables con correlación > 0.15:", relevant_features)
-
-sns.heatmap(xy[relevant_features + ["Survived"]].corr(), annot=True, cmap="coolwarm")
-plt.title("Matriz de correlación")
-plt.show()
+print(data['censoVivienda'].value_counts()) 
 
 
 
+if "censoVivienda" in data.columns:
+    print("Valores únicos de 'censoVivienda' antes:", data["censoVivienda"].unique())
+    data["censoVivienda"] = data["censoVivienda"].map({"si": 0, "no": 1})
+    print("Valores únicos de 'censoVivienda' después:", data["censoVivienda"].unique())
+else:
+    print("⚠ La columna 'censoVivienda' no existe. Ajusta el código si tu dataset es diferente.")
+
+
+# One-Hot Encoder para estadoProceso
+
+if "servPublicos" in data.columns:
+    print("Valores únicos de 'embarked' antes:", data["servPublicos"].unique())
+    data = pd.get_dummies(data, columns=["servPublicos"], prefix="servPublicos", drop_first=True)
+    print("Columnas de 'servPublicos' después del OHE:")
+    print([col for col in data.columns if col.startswith("servPublicos_")])
+else:
+    print("⚠ La columna 'servPublicos' no existe. Ajusta el código si tu dataset es diferente.")
+
+NOMBRE_SALIDA = "dataset_limpio_para_ml.csv"
+data.to_csv(NOMBRE_SALIDA, index=False)
 
